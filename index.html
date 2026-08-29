@@ -5,104 +5,797 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Timecode Show — 60 min</title>
+<title>Timecode Show — Sacrare</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.wrap{max-width:760px;margin:auto;padding:18px 16px 28px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-h1{font-size:20px;margin:0}.badge{font-size:12px;color:#bbb}.card{background:#151515;border:1px solid #292929;border-radius:18px;padding:20px;margin-top:14px}
-.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}.current{font-size:29px;font-weight:750;margin:7px 0 4px}.type{font-size:14px;color:#aaa}.timer{font-variant-numeric:tabular-nums;font-size:64px;font-weight:800;text-align:center;margin:22px 0 2px}.sub{text-align:center;color:#aaa;font-size:13px}
-.progress{height:9px;background:#292929;border-radius:99px;overflow:hidden;margin:18px 0}.bar{height:100%;width:0;background:#fff;transition:width .25s linear}
-.next{font-size:20px;font-weight:650;margin-top:5px}.nexttime{font-size:27px;font-variant-numeric:tabular-nums;margin-top:4px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.stat{background:#151515;border:1px solid #292929;border-radius:14px;padding:13px}.stat b{display:block;font-size:21px;margin-top:4px;font-variant-numeric:tabular-nums}
-.buttons{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px;margin-top:14px}button{border:0;border-radius:14px;padding:16px 10px;background:#292929;color:#fff;font-size:16px;font-weight:700}button.main{background:#fff;color:#000}button:active{transform:scale(.98)}
-.list{margin-top:14px}.row{display:grid;grid-template-columns:72px 1fr 72px;gap:8px;align-items:center;padding:11px 4px;border-bottom:1px solid #222;font-size:14px}.row.active{background:#202020;border-radius:10px;padding-left:10px}.time{color:#aaa;font-variant-numeric:tabular-nums}.dur{text-align:right;color:#aaa;font-variant-numeric:tabular-nums}.small{color:#aaa;font-size:12px;margin-top:4px}
-@media(max-width:480px){.timer{font-size:54px}.current{font-size:25px}.row{grid-template-columns:64px 1fr 60px}}
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#080808;
+color:#fff;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+
+.wrap{
+max-width:760px;
+margin:auto;
+padding:18px 16px 28px
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px
+}
+
+h1{
+font-size:20px;
+margin:0
+}
+
+.badge{
+font-size:12px;
+color:#bbb
+}
+
+.card{
+background:#151515;
+border:1px solid #292929;
+border-radius:18px;
+padding:20px;
+margin-top:14px
+}
+
+.label{
+font-size:12px;
+color:#aaa;
+text-transform:uppercase;
+letter-spacing:.08em
+}
+
+.current{
+font-size:29px;
+font-weight:750;
+margin:7px 0 4px
+}
+
+.type{
+font-size:14px;
+color:#aaa
+}
+
+.timer{
+font-variant-numeric:tabular-nums;
+font-size:64px;
+font-weight:800;
+text-align:center;
+margin:22px 0 2px
+}
+
+.sub{
+text-align:center;
+color:#aaa;
+font-size:13px
+}
+
+.progress{
+height:9px;
+background:#292929;
+border-radius:99px;
+overflow:hidden;
+margin:18px 0
+}
+
+.bar{
+height:100%;
+width:0;
+background:#fff;
+transition:width .15s linear
+}
+
+.next{
+font-size:20px;
+font-weight:650;
+margin-top:5px
+}
+
+.nexttime{
+font-size:27px;
+font-variant-numeric:tabular-nums;
+margin-top:4px
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:14px
+}
+
+.stat{
+background:#151515;
+border:1px solid #292929;
+border-radius:14px;
+padding:13px
+}
+
+.stat b{
+display:block;
+font-size:21px;
+margin-top:4px;
+font-variant-numeric:tabular-nums
+}
+
+.buttons{
+display:grid;
+grid-template-columns:1fr 1.5fr 1fr;
+gap:10px;
+margin-top:14px
+}
+
+button{
+border:0;
+border-radius:14px;
+padding:16px 10px;
+background:#292929;
+color:#fff;
+font-size:16px;
+font-weight:700
+}
+
+button.main{
+background:#fff;
+color:#000
+}
+
+button:active{
+transform:scale(.98)
+}
+
+.list{
+margin-top:14px
+}
+
+.row{
+display:grid;
+grid-template-columns:72px 1fr 72px;
+gap:8px;
+align-items:center;
+padding:11px 4px;
+border-bottom:1px solid #222;
+font-size:14px
+}
+
+.row.active{
+background:#202020;
+border-radius:10px;
+padding-left:10px
+}
+
+.time{
+color:#aaa;
+font-variant-numeric:tabular-nums
+}
+
+.dur{
+text-align:right;
+color:#aaa;
+font-variant-numeric:tabular-nums
+}
+
+.small{
+color:#aaa;
+font-size:12px;
+margin-top:4px
+}
+
+.audioStatus{
+text-align:center;
+color:#aaa;
+font-size:12px;
+margin-top:12px;
+min-height:16px
+}
+
+@media(max-width:480px){
+.timer{
+font-size:54px
+}
+
+.current{
+font-size:25px
+}
+
+.row{
+grid-template-columns:64px 1fr 60px
+}
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
-  <div class="top"><div><h1>TIMEcode SHOW</h1><div class="badge">Repertório — 60:02</div></div><div id="count">1 / 20</div></div>
 
-  <div class="card">
-    <div class="label">Momento atual</div>
-    <div class="current" id="current">Abertura</div>
-    <div class="type" id="type">Música • 01:30</div>
-    <div class="timer" id="elapsed">00:00</div>
-    <div class="sub">decorrido • <span id="remainCurrent">01:30</span> restantes neste momento</div>
-    <div class="progress"><div class="bar" id="bar"></div></div>
+<div class="top">
 
-    <div class="label">Próximo</div>
-    <div class="next" id="next">99 não é 100</div>
-    <div class="nexttime">começa em <span id="toNext">01:30</span></div>
-  </div>
-
-  <div class="grid">
-    <div class="stat"><span class="label">Show decorrido</span><b id="showElapsed">00:00</b></div>
-    <div class="stat"><span class="label">Show restante</span><b id="showRemain">01:00:02</b></div>
-  </div>
-
-  <div class="buttons">
-    <button onclick="prev()">↩ Voltar</button>
-    <button class="main" id="play" onclick="toggle()">▶ Iniciar</button>
-    <button onclick="next()">Próximo ⏭</button>
-  </div>
-
-  <div class="list" id="list"></div>
+<div>
+<h1>TIMEcode SHOW</h1>
+<div class="badge">Sacrare • Timecode + Áudio</div>
 </div>
+
+<div id="count">1 / 19</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">Momento atual</div>
+
+<div class="current" id="current">
+Abertura + 99 não é 100
+</div>
+
+<div class="type" id="type">
+Música • carregando áudio...
+</div>
+
+<div class="timer" id="elapsed">
+00:00
+</div>
+
+<div class="sub">
+decorrido •
+<span id="remainCurrent">--:--</span>
+restantes neste momento
+</div>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+
+<div class="label">Próximo</div>
+
+<div class="next" id="next">
+Restaurador
+</div>
+
+<div class="nexttime">
+começa em
+<span id="toNext">--:--</span>
+</div>
+
+<div class="audioStatus" id="audioStatus">
+Áudio pronto para iniciar
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="stat">
+<span class="label">Show decorrido</span>
+<b id="showElapsed">00:00:00</b>
+</div>
+
+<div class="stat">
+<span class="label">Show restante</span>
+<b id="showRemain">--:--:--</b>
+</div>
+
+</div>
+
+
+<div class="buttons">
+
+<button onclick="prev()">
+↩ Voltar
+</button>
+
+<button class="main" id="play" onclick="toggle()">
+▶ Iniciar
+</button>
+
+<button onclick="next()">
+Próximo ⏭
+</button>
+
+</div>
+
+
+<div class="list" id="list"></div>
+
+
+<audio id="audio" preload="metadata"></audio>
+
+</div>
+
+
 <script>
-const items=[
-["Abertura",90,"Música"],["99 não é 100",164,"Música"],["Restaurador",275,"Música"],
-["Fala apresentação + lados",40,"Fala"],["Medley Alegria",320,"Música"],
-["Fala bota e chapéu",40,"Fala"],["Cheia de Graça",308,"Música"],
-["Fala redes sociais + Sacrare + story",90,"Fala"],["Inspira",216,"Música"],
-["Ministração Carol",150,"Ministração"],["Lugar Seguro",280,"Música"],
-["Ministração Dami",60,"Ministração"],["Jesus está aqui + Lázaro",375,"Música"],
-["Oração livre + refrão Jesus está aqui",240,"Oração"],["Apresentação banda + agradecimento + lados",90,"Fala"],
-["Ensina dança + fala EP Alterado",90,"Fala"],["Alterado",230,"Música"],
-["Medley Tenda / Seja / Jesus",260,"Música"],["Fala tchau + Eu não vou embora + redes sociais",90,"Fala"],
-["Evangelizar",194,"Música"]
+
+const AUDIO_FILE =
+"ABERTURA + 99 NÃO É 100.mp3";
+
+
+const items = [
+
+["Abertura + 99 não é 100",0,"Música",true],
+
+["Restaurador",275,"Música",false],
+
+["Fala apresentação + lados",40,"Fala",false],
+
+["Medley Alegria",320,"Música",false],
+
+["Fala bota e chapéu",40,"Fala",false],
+
+["Cheia de Graça",308,"Música",false],
+
+["Fala redes sociais + Sacrare + story",90,"Fala",false],
+
+["Inspira",216,"Música",false],
+
+["Ministração Carol",150,"Ministração",false],
+
+["Lugar Seguro",280,"Música",false],
+
+["Ministração Dami",60,"Ministração",false],
+
+["Jesus está aqui + Lázaro",375,"Música",false],
+
+["Oração livre + refrão Jesus está aqui",240,"Oração",false],
+
+["Apresentação banda + agradecimento + lados",90,"Fala",false],
+
+["Ensina dança + fala EP Alterado",90,"Fala",false],
+
+["Alterado",230,"Música",false],
+
+["Medley Tenda / Seja / Jesus",260,"Música",false],
+
+["Fala tchau + Eu não vou embora + redes sociais",90,"Fala",false],
+
+["Evangelizar",194,"Música",false]
+
 ];
-const total=items.reduce((a,x)=>a+x[1],0);
-let idx=0, elapsed=0, running=false, last=0, timer=null;
+
+
+const audio =
+document.getElementById("audio");
+
+audio.src =
+encodeURI(AUDIO_FILE);
+
+
+let idx = 0;
+
+let elapsed = 0;
+
+let running = false;
+
+let timer = null;
+
+let audioReady = false;
+
 
 function fmt(s,hour=false){
- s=Math.max(0,Math.round(s)); let h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
- return (h||hour)?String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+
+s=Math.max(0,Math.round(s));
+
+let h=Math.floor(s/3600);
+
+let m=Math.floor((s%3600)/60);
+
+let sec=s%60;
+
+if(h||hour){
+
+return String(h).padStart(2,"0")
++":"+String(m).padStart(2,"0")
++":"+String(sec).padStart(2,"0");
+
 }
-function show(){
- const [name,dur,type]=items[idx];
- document.getElementById("current").textContent=name;
- document.getElementById("type").textContent=type+" • "+fmt(dur);
- document.getElementById("elapsed").textContent=fmt(elapsed);
- document.getElementById("remainCurrent").textContent=fmt(Math.max(0,dur-elapsed));
- document.getElementById("bar").style.width=Math.min(100,elapsed/dur*100)+"%";
- document.getElementById("next").textContent=items[idx+1]?.[0]||"FIM DO SHOW";
- let toNext=Math.max(0,dur-elapsed);
- document.getElementById("toNext").textContent=idx===items.length-1?"—":fmt(toNext);
- let before=items.slice(0,idx).reduce((a,x)=>a+x[1],0);
- document.getElementById("showElapsed").textContent=fmt(before+elapsed,true);
- document.getElementById("showRemain").textContent=fmt(Math.max(0,total-before-elapsed),true);
- document.getElementById("count").textContent=(idx+1)+" / "+items.length;
- document.getElementById("play").textContent=running?"⏸ Pausar":"▶ Iniciar";
- document.getElementById("list").innerHTML=items.map((x,i)=>{
-   let start=items.slice(0,i).reduce((a,y)=>a+y[1],0);
-   return `<div class="row ${i===idx?'active':''}"><div class="time">${fmt(start,true)}</div><div>${x[0]}<div class="small">${x[2]}</div></div><div class="dur">${fmt(x[1])}</div></div>`;
- }).join("");
+
+return String(m).padStart(2,"0")
++":"+String(sec).padStart(2,"0");
+
 }
+
+
+function beforeIndex(i){
+
+return items
+.slice(0,i)
+.reduce((a,x)=>a+x[1],0);
+
+}
+
+
+function totalDuration(){
+
+return items.reduce((a,x)=>a+x[1],0);
+
+}
+
+
+function render(){
+
+const item=items[idx];
+
+const dur=item[1];
+
+
+document.getElementById("current").textContent =
+item[0];
+
+
+document.getElementById("type").textContent =
+item[2]+" • "+
+(dur>0 ? fmt(dur) : "carregando áudio...");
+
+
+document.getElementById("elapsed").textContent =
+fmt(elapsed);
+
+
+document.getElementById("remainCurrent").textContent =
+dur>0 ? fmt(Math.max(0,dur-elapsed)) : "--:--";
+
+
+document.getElementById("bar").style.width =
+dur>0
+? Math.min(100,elapsed/dur*100)+"%"
+: "0%";
+
+
+document.getElementById("next").textContent =
+items[idx+1]
+? items[idx+1][0]
+: "FIM DO SHOW";
+
+
+document.getElementById("toNext").textContent =
+idx===items.length-1
+? "—"
+: dur>0
+? fmt(Math.max(0,dur-elapsed))
+: "--:--";
+
+
+const showElapsed =
+beforeIndex(idx)+elapsed;
+
+
+document.getElementById("showElapsed").textContent =
+fmt(showElapsed,true);
+
+
+document.getElementById("showRemain").textContent =
+fmt(Math.max(0,totalDuration()-showElapsed),true);
+
+
+document.getElementById("count").textContent =
+(idx+1)+" / "+items.length;
+
+
+document.getElementById("play").textContent =
+running
+? "⏸ Pausar"
+: "▶ Iniciar";
+
+
+document.querySelectorAll(".row")
+.forEach((r,i)=>{
+r.classList.toggle("active",i===idx);
+});
+
+}
+
+
+audio.addEventListener("loadedmetadata",()=>{
+
+if(isFinite(audio.duration) && audio.duration>0){
+
+items[0][1]=audio.duration;
+
+audioReady=true;
+
+document.getElementById("audioStatus").textContent =
+"Áudio carregado • "+fmt(audio.duration);
+
+render();
+
+}
+
+});
+
+
+audio.addEventListener("timeupdate",()=>{
+
+if(idx!==0)return;
+
+elapsed=audio.currentTime;
+
+render();
+
+});
+
+
+audio.addEventListener("play",()=>{
+
+running=true;
+
+document.getElementById("audioStatus").textContent =
+"▶ Áudio tocando";
+
+render();
+
+});
+
+
+audio.addEventListener("pause",()=>{
+
+if(idx===0 && !audio.ended){
+
+running=false;
+
+document.getElementById("audioStatus").textContent =
+"⏸ Áudio pausado";
+
+render();
+
+}
+
+});
+
+
+audio.addEventListener("ended",()=>{
+
+elapsed=items[0][1];
+
+running=false;
+
+if(idx<items.length-1){
+
+idx++;
+
+elapsed=0;
+
+navigator.vibrate?.([100,70,100]);
+
+document.getElementById("audioStatus").textContent =
+"Áudio finalizado • próximo momento";
+
+}else{
+
+alert("SHOW FINALIZADO");
+
+}
+
+render();
+
+});
+
+
 function tick(){
- if(!running)return;
- const now=performance.now(); elapsed+=(now-last)/1000; last=now;
- if(elapsed>=items[idx][1]){
-   elapsed=items[idx][1]; show();
-   if(idx<items.length-1){idx++;elapsed=0; navigator.vibrate?.([100,70,100]);}
-   else {running=false; alert("SHOW FINALIZADO — 60:02");}
- }
- show();
+
+if(!running || idx===0)return;
+
+const now=performance.now();
+
+const dt=(now-(tick.last||now))/1000;
+
+tick.last=now;
+
+elapsed+=dt;
+
+
+if(elapsed>=items[idx][1]){
+
+elapsed=items[idx][1];
+
+if(idx<items.length-1){
+
+idx++;
+
+elapsed=0;
+
+navigator.vibrate?.([100,70,100]);
+
+}else{
+
+running=false;
+
+alert("SHOW FINALIZADO");
+
 }
-function toggle(){running=!running;last=performance.now();if(running&&!timer)timer=setInterval(tick,100);show();}
-function next(){idx=Math.min(items.length-1,idx+1);elapsed=0;last=performance.now();show();}
-function prev(){if(elapsed>8){elapsed=0}else{idx=Math.max(0,idx-1);elapsed=0}last=performance.now();show();}
-show();
+
+}
+
+render();
+
+}
+
+
+function toggle(){
+
+if(idx===0){
+
+if(!audioReady){
+
+audio.load();
+
+audio.play().catch(()=>{
+
+document.getElementById("audioStatus").textContent =
+"Toque novamente em Iniciar para liberar o áudio.";
+
+});
+
+return;
+
+}
+
+
+if(running){
+
+audio.pause();
+
+running=false;
+
+}else{
+
+audio.currentTime=elapsed;
+
+audio.play().catch(()=>{
+
+document.getElementById("audioStatus").textContent =
+"Toque novamente em Iniciar para tocar o áudio.";
+
+});
+
+}
+
+render();
+
+return;
+
+}
+
+
+running=!running;
+
+tick.last=performance.now();
+
+
+if(running && !timer){
+
+timer=setInterval(tick,100);
+
+}
+
+render();
+
+}
+
+
+function next(){
+
+if(idx===0){
+
+audio.pause();
+
+}
+
+idx=Math.min(items.length-1,idx+1);
+
+elapsed=0;
+
+running=false;
+
+tick.last=performance.now();
+
+render();
+
+}
+
+
+function prev(){
+
+if(idx===0){
+
+audio.currentTime=0;
+
+elapsed=0;
+
+}else{
+
+idx=Math.max(0,idx-1);
+
+elapsed=0;
+
+running=false;
+
+if(idx===0){
+
+audio.currentTime=0;
+
+}
+
+}
+
+tick.last=performance.now();
+
+render();
+
+}
+
+
+items.forEach((item,i)=>{
+
+const row=document.createElement("div");
+
+row.className="row";
+
+row.onclick=()=>{
+
+if(i===0){
+
+audio.pause();
+
+audio.currentTime=0;
+
+}
+
+idx=i;
+
+elapsed=0;
+
+running=false;
+
+render();
+
+};
+
+
+const start=beforeIndex(i);
+
+const duration=
+item[1]>0
+? fmt(item[1])
+: "--:--";
+
+
+row.innerHTML=
+
+`<div class="time">
+${fmt(start,true)}
+</div>
+
+<div>
+${item[0]}
+<div class="small">${item[2]}</div>
+</div>
+
+<div class="dur">
+${duration}
+</div>`;
+
+
+document.getElementById("list")
+.appendChild(row);
+
+});
+
+
+render();
+
 </script>
+
 </body>
 </html>
