@@ -5,314 +5,126 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Timecode Show — 60 min</title>
+<title>TIMEcode SHOW — Sacrare</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.wrap{max-width:760px;margin:auto;padding:18px 16px 28px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-h1{font-size:20px;margin:0}
-.badge{font-size:12px;color:#bbb}
-.card{background:#151515;border:1px solid #292929;border-radius:18px;padding:20px;margin-top:14px}
-.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}
-.current{font-size:29px;font-weight:750;margin:7px 0 4px}
-.type{font-size:14px;color:#aaa}
-.timer{font-variant-numeric:tabular-nums;font-size:64px;font-weight:800;text-align:center;margin:22px 0 2px}
-.sub{text-align:center;color:#aaa;font-size:13px}
-.progress{height:9px;background:#292929;border-radius:99px;overflow:hidden;margin:18px 0}
-.bar{height:100%;width:0;background:#fff;transition:width .15s linear}
-.next{font-size:20px;font-weight:650;margin-top:5px}
-.nexttime{font-size:27px;font-variant-numeric:tabular-nums;margin-top:4px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.stat{background:#151515;border:1px solid #292929;border-radius:14px;padding:13px}
-.stat b{display:block;font-size:21px;margin-top:4px;font-variant-numeric:tabular-nums}
-.buttons{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px;margin-top:14px}
-button{border:0;border-radius:14px;padding:16px 10px;background:#292929;color:#fff;font-size:16px;font-weight:700}
-button.main{background:#fff;color:#000}
-button:active{transform:scale(.98)}
-.list{margin-top:14px}
-.row{display:grid;grid-template-columns:72px 1fr 72px;gap:8px;align-items:center;padding:11px 4px;border-bottom:1px solid #222;font-size:14px}
-.row.active{background:#202020;border-radius:10px;padding-left:10px}
-.time{color:#aaa;font-variant-numeric:tabular-nums}
-.dur{text-align:right;color:#aaa;font-variant-numeric:tabular-nums}
-.small{color:#aaa;font-size:12px;margin-top:4px}
-.audioStatus{text-align:center;color:#aaa;font-size:12px;margin-top:10px;min-height:16px}
-@media(max-width:480px){
-.timer{font-size:54px}
-.current{font-size:25px}
-.row{grid-template-columns:64px 1fr 60px}
-}
+*{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 30px}.top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:20px;margin:0}.badge{font-size:12px;color:#aaa}.card{background:#151515;border:1px solid #292929;border-radius:20px;padding:20px;margin-top:14px}
+.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}.current{font-size:28px;font-weight:800;margin-top:7px}
+.type{font-size:14px;color:#aaa;margin-top:4px}.timer{font-size:64px;font-weight:800;text-align:center;margin:20px 0 3px;font-variant-numeric:tabular-nums}
+.sub{text-align:center;color:#aaa;font-size:13px}.progress{height:9px;background:#292929;border-radius:99px;overflow:hidden;margin:18px 0}
+.bar{height:100%;width:0;background:#fff}.next{font-size:20px;font-weight:700;margin-top:5px}.nexttime{font-size:27px;margin-top:3px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.stat{background:#151515;border:1px solid #292929;border-radius:15px;padding:14px}
+.stat b{display:block;font-size:21px;margin-top:4px;font-variant-numeric:tabular-nums}.buttons{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px;margin-top:14px}
+button{border:0;border-radius:15px;padding:17px 9px;background:#292929;color:#fff;font-size:16px;font-weight:750}button.main{background:#fff;color:#000}
+.status{text-align:center;color:#aaa;font-size:12px;margin-top:10px;min-height:16px}.list{margin-top:14px}
+.row{display:grid;grid-template-columns:72px 1fr 72px;gap:8px;align-items:center;padding:12px 5px;border-bottom:1px solid #222;cursor:pointer}
+.row.active{background:#202020;border-radius:12px}.time,.dur{color:#aaa;font-variant-numeric:tabular-nums}.dur{text-align:right}
+.small{color:#aaa;font-size:12px;margin-top:3px}@media(max-width:480px){.timer{font-size:55px}.current{font-size:25px}.row{grid-template-columns:64px 1fr 60px}}
 </style>
 </head>
-
 <body>
 <div class="wrap">
-
-<div class="top">
-  <div>
-    <h1>TIMEcode SHOW</h1>
-    <div class="badge">Repertório — com áudio de abertura</div>
-  </div>
-  <div id="count">1 / 19</div>
-</div>
+<div class="top"><div><h1>TIMEcode SHOW</h1><div class="badge">Sacrare • áudio único sincronizado</div></div><div id="count">1 / 19</div></div>
 
 <div class="card">
-  <div class="label">Momento atual</div>
-  <div class="current" id="current">Abertura + 99 não é 100</div>
-  <div class="type" id="type">Música • carregando áudio...</div>
-  <div class="timer" id="elapsed">00:00</div>
-  <div class="sub">decorrido • <span id="remainCurrent">--:--</span> restantes neste momento</div>
-  <div class="progress"><div class="bar" id="bar"></div></div>
-
-  <div class="label">Próximo</div>
-  <div class="next" id="next">Restaurador</div>
-  <div class="nexttime">começa em <span id="toNext">--:--</span></div>
-  <div class="audioStatus" id="audioStatus">Áudio pronto para iniciar</div>
+<div class="label">Momento atual</div>
+<div class="current" id="current">Abertura + 99 não é 100</div>
+<div class="type" id="type">Música</div>
+<div class="timer" id="timer">00:00</div>
+<div class="sub">decorrido • <span id="currentRemain">04:14</span> restantes</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div class="label">Próximo</div>
+<div class="next" id="next">Restaurador</div>
+<div class="nexttime">começa em <span id="nextIn">04:14</span></div>
+<div class="status" id="status">Toque em Iniciar para começar o show</div>
 </div>
 
 <div class="grid">
-  <div class="stat"><span class="label">Show decorrido</span><b id="showElapsed">00:00:00</b></div>
-  <div class="stat"><span class="label">Show restante</span><b id="showRemain">--:--:--</b></div>
+<div class="stat"><span class="label">Show decorrido</span><b id="showElapsed">00:00:00</b></div>
+<div class="stat"><span class="label">Show restante</span><b id="showRemain">01:00:00</b></div>
 </div>
 
 <div class="buttons">
-  <button onclick="prev()">↩ Voltar</button>
-  <button class="main" id="play" onclick="toggle()">▶ Iniciar</button>
-  <button onclick="next()">Próximo ⏭</button>
+<button onclick="previous()">↩ Voltar</button>
+<button class="main" id="playBtn" onclick="toggle()">▶ Iniciar</button>
+<button onclick="next()">Próximo ⏭</button>
 </div>
 
 <div class="list" id="list"></div>
-
 <audio id="audio" preload="metadata"></audio>
-
 </div>
 
 <script>
-const AUDIO_FILE = "ABERTURA + 99 NÃO É 100.mp3";
-
-const items=[
-  ["Abertura + 99 não é 100",0,"Música",true],
-  ["Restaurador",275,"Música",false],
-  ["Fala apresentação + lados",40,"Fala",false],
-  ["Medley Alegria",320,"Música",false],
-  ["Fala bota e chapéu",40,"Fala",false],
-  ["Cheia de Graça",308,"Música",false],
-  ["Fala redes sociais + Sacrare + story",90,"Fala",false],
-  ["Inspira",216,"Música",false],
-  ["Ministração Carol",150,"Ministração",false],
-  ["Lugar Seguro",280,"Música",false],
-  ["Ministração Dami",60,"Ministração",false],
-  ["Jesus está aqui + Lázaro",375,"Música",false],
-  ["Oração livre + refrão Jesus está aqui",240,"Oração",false],
-  ["Apresentação banda + agradecimento + lados",90,"Fala",false],
-  ["Ensina dança + fala EP Alterado",90,"Fala",false],
-  ["Alterado",230,"Música",false],
-  ["Medley Tenda / Seja / Jesus",260,"Música",false],
-  ["Fala tchau + Eu não vou embora + redes sociais",90,"Fala",false],
-  ["Evangelizar",194,"Música",false]
+const SHOW_AUDIO="VS SHOW SACRARE 2026.mp3";
+const data=[
+["Abertura + 99 não é 100",0,"Música"],
+["Restaurador",254,"Música"],
+["Fala apresentação + lados",529,"Fala"],
+["Medley Alegria",569,"Música"],
+["Fala bota e chapéu",889,"Fala"],
+["Cheia de Graça",929,"Música"],
+["Fala redes sociais + Sacrare + Story",1237,"Fala"],
+["Inspira",1327,"Música"],
+["Ministração Carol",1543,"Ministração"],
+["Lugar Seguro",1693,"Música"],
+["Ministração Dami",1973,"Ministração"],
+["Jesus está aqui + Lázaro",2033,"Música"],
+["Oração livre + refrão Jesus está aqui",2408,"Oração"],
+["Apresentação banda + agradecimento + lados",2648,"Fala"],
+["Ensina dança + fala EP Alterado",2738,"Fala"],
+["Alterado",2828,"Música"],
+["Medley Tenda / Seja / Jesus",3058,"Música"],
+["Fala tchau + Eu não vou embora + redes sociais",3318,"Fala"],
+["Evangelizar",3408,"Música"]
 ];
+let audio=document.getElementById("audio"), running=false, raf=null, duration=3600.039184;
 
-const audio=document.getElementById("audio");
-let idx=0;
-let elapsed=0;
-let running=false;
-let timer=null;
-let audioReady=false;
+audio.src=encodeURI(SHOW_AUDIO);
 
-audio.src=encodeURI(AUDIO_FILE);
-
-function fmt(s,hour=false){
-  s=Math.max(0,Math.round(s));
-  let h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
-  return (h||hour)
-    ? String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0")
-    : String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+function fmt(sec,hours=false){
+ sec=Math.max(0,Math.round(sec)); let h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+ if(hours||h)return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+ return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
 }
-
-function totalDuration(){
-  return items.reduce((a,x)=>a+x[1],0);
+function activeIndex(t){
+ let i=0; for(let n=0;n<data.length;n++){if(t>=data[n][1])i=n;else break} return i;
 }
-
-function beforeIndex(i){
-  return items.slice(0,i).reduce((a,x)=>a+x[1],0);
+function render(){
+ let t=audio.currentTime||0, i=activeIndex(t), start=data[i][1], end=i+1<data.length?data[i+1][1]:duration;
+ document.getElementById("count").textContent=(i+1)+" / "+data.length;
+ document.getElementById("current").textContent=data[i][0];
+ document.getElementById("type").textContent=data[i][2]+" • "+fmt(end-start);
+ document.getElementById("timer").textContent=fmt(t-start);
+ document.getElementById("currentRemain").textContent=fmt(Math.max(0,end-t));
+ document.getElementById("bar").style.width=Math.min(100,Math.max(0,(t-start)/(end-start)*100))+"%";
+ document.getElementById("next").textContent=i+1<data.length?data[i+1][0]:"FIM DO SHOW";
+ document.getElementById("nextIn").textContent=i+1<data.length?fmt(end-t):"—";
+ document.getElementById("showElapsed").textContent=fmt(t,true);
+ document.getElementById("showRemain").textContent=fmt(Math.max(0,duration-t),true);
+ document.getElementById("playBtn").textContent=running?"⏸ Pausar":"▶ Iniciar";
+ document.querySelectorAll(".row").forEach((r,n)=>r.classList.toggle("active",n===i));
 }
-
-function show(){
-  const item=items[idx];
-  const name=item[0],dur=item[1],type=item[2];
-
-  document.getElementById("current").textContent=name;
-  document.getElementById("type").textContent=type+" • "+(dur>0?fmt(dur):"carregando áudio...");
-  document.getElementById("elapsed").textContent=fmt(elapsed);
-  document.getElementById("remainCurrent").textContent=dur>0?fmt(Math.max(0,dur-elapsed)):"--:--";
-  document.getElementById("bar").style.width=dur>0?Math.min(100,elapsed/dur*100)+"%":"0%";
-
-  document.getElementById("next").textContent=items[idx+1]?.[0]||"FIM DO SHOW";
-  document.getElementById("toNext").textContent=idx===items.length-1?"—":(dur>0?fmt(Math.max(0,dur-elapsed)):"--:--");
-
-  const total=totalDuration();
-  const showElapsed=beforeIndex(idx)+elapsed;
-  document.getElementById("showElapsed").textContent=fmt(showElapsed,true);
-  document.getElementById("showRemain").textContent=total>0?fmt(Math.max(0,total-showElapsed),true):"--:--:--";
-
-  document.getElementById("count").textContent=(idx+1)+" / "+items.length;
-  document.getElementById("play").textContent=running?"⏸ Pausar":"▶ Iniciar";
-
-  document.getElementById("list").innerHTML=items.map((x,i)=>{
-    const start=beforeIndex(i);
-    const duration=x[1]>0?fmt(x[1]):(audioReady?fmt(audio.duration):"--:--");
-    return `<div class="row ${i===idx?'active':''}">
-      <div class="time">${fmt(start,true)}</div>
-      <div>${x[0]}<div class="small">${x[2]}</div></div>
-      <div class="dur">${duration}</div>
-    </div>`;
-  }).join("");
-}
-
-audio.addEventListener("loadedmetadata",()=>{
-  if(isFinite(audio.duration) && audio.duration>0){
-    items[0][1]=audio.duration;
-    audioReady=true;
-    document.getElementById("audioStatus").textContent="Áudio carregado • "+fmt(audio.duration);
-    show();
-  }
-});
-
-audio.addEventListener("timeupdate",()=>{
-  if(idx!==0) return;
-  elapsed=audio.currentTime;
-  if(items[0][1]>0 && elapsed>=items[0][1]-0.05){
-    elapsed=items[0][1];
-  }
-  show();
-});
-
-audio.addEventListener("play",()=>{
-  running=true;
-  document.getElementById("audioStatus").textContent="▶ Áudio tocando";
-  show();
-});
-
-audio.addEventListener("pause",()=>{
-  if(idx===0 && !audio.ended){
-    running=false;
-    document.getElementById("audioStatus").textContent="⏸ Áudio pausado";
-    show();
-  }
-});
-
-audio.addEventListener("ended",()=>{
-  elapsed=items[0][1];
-  running=false;
-  show();
-
-  if(idx<items.length-1){
-    idx++;
-    elapsed=0;
-    navigator.vibrate?.([100,70,100]);
-    document.getElementById("audioStatus").textContent="Áudio finalizado • próximo momento";
-    show();
-  }else{
-    alert("SHOW FINALIZADO");
-  }
-});
-
-function tick(){
-  if(!running || idx===0) return;
-  const now=performance.now();
-  const dt=(now-(tick.last||now))/1000;
-  tick.last=now;
-  elapsed+=dt;
-
-  if(elapsed>=items[idx][1]){
-    elapsed=items[idx][1];
-    show();
-
-    if(idx<items.length-1){
-      idx++;
-      elapsed=0;
-      navigator.vibrate?.([100,70,100]);
-    }else{
-      running=false;
-      alert("SHOW FINALIZADO");
-    }
-  }
-  show();
-}
-
+function loop(){if(!running)return;render();raf=requestAnimationFrame(loop)}
 function toggle(){
-  if(idx===0){
-    if(!audioReady){
-      document.getElementById("audioStatus").textContent="Carregando áudio...";
-      audio.load();
-      audio.play().catch(()=>{
-        document.getElementById("audioStatus").textContent="Toque novamente em Iniciar para liberar o áudio.";
-      });
-      return;
-    }
-
-    if(running){
-      audio.pause();
-      running=false;
-    }else{
-      audio.currentTime=elapsed;
-      audio.play().catch(()=>{
-        document.getElementById("audioStatus").textContent="Toque novamente em Iniciar para tocar o áudio.";
-      });
-    }
-    show();
-    return;
-  }
-
-  running=!running;
-  tick.last=performance.now();
-
-  if(running && !timer){
-    timer=setInterval(tick,100);
-  }
-
-  show();
+ if(audio.paused){
+   audio.play().then(()=>{running=true;document.getElementById("status").textContent="▶ Show tocando";loop()})
+   .catch(()=>document.getElementById("status").textContent="Toque novamente em Iniciar para liberar o áudio.");
+ }else{audio.pause();running=false;document.getElementById("status").textContent="⏸ Show pausado";render()}
 }
-
-function next(){
-  if(idx===0) audio.pause();
-
-  idx=Math.min(items.length-1,idx+1);
-  elapsed=0;
-  running=false;
-  tick.last=performance.now();
-
-  if(idx!==0){
-    document.getElementById("audioStatus").textContent="Áudio da abertura parado";
-  }
-
-  show();
-}
-
-function prev(){
-  if(idx===0){
-    if(elapsed>8){
-      audio.currentTime=0;
-      elapsed=0;
-    }else{
-      audio.currentTime=0;
-      elapsed=0;
-    }
-  }else{
-    idx=Math.max(0,idx-1);
-    elapsed=0;
-    running=false;
-    if(idx===0){
-      audio.currentTime=0;
-      document.getElementById("audioStatus").textContent="Áudio pronto para iniciar";
-    }
-  }
-  tick.last=performance.now();
-  show();
-}
-
-show();
+function seekTo(i){if(i<0||i>=data.length)return;audio.currentTime=data[i][1];render()}
+function next(){let i=activeIndex(audio.currentTime||0);seekTo(Math.min(data.length-1,i+1))}
+function previous(){let t=audio.currentTime||0,i=activeIndex(t);if(t-data[i][1]>8)seekTo(i);else seekTo(Math.max(0,i-1))}
+audio.addEventListener("loadedmetadata",()=>{duration=audio.duration||duration;render();document.getElementById("status").textContent="Áudio carregado • "+fmt(duration,true)});
+audio.addEventListener("play",()=>{running=true;loop()});
+audio.addEventListener("pause",()=>{running=false;render()});
+audio.addEventListener("ended",()=>{running=false;audio.currentTime=duration;document.getElementById("status").textContent="■ SHOW FINALIZADO";render()});
+data.forEach((x,i)=>{
+ let row=document.createElement("div");row.className="row";row.onclick=()=>seekTo(i);
+ row.innerHTML='<div class="time">'+fmt(x[1],true)+'</div><div>'+x[0]+'<div class="small">'+x[2]+'</div></div><div class="dur">'+(i+1<data.length?fmt(data[i+1][1]-x[1]):fmt(duration-x[1]))+'</div>';
+ document.getElementById("list").appendChild(row);
+});
+render();
 </script>
-
 </body>
 </html>
