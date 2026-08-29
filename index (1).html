@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TIMEcode SHOW — Sacrare</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 28px}
+.top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:20px;margin:0}
+.badge{font-size:12px;color:#aaa}
+.card{background:#151515;border:1px solid #292929;border-radius:18px;padding:20px;margin-top:14px}
+.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}
+.current{font-size:29px;font-weight:750;margin:7px 0 4px}
+.type{font-size:14px;color:#aaa}
+.timer{font-variant-numeric:tabular-nums;font-size:64px;font-weight:800;text-align:center;margin:22px 0 2px}
+.sub{text-align:center;color:#aaa;font-size:13px}
+.progress{height:9px;background:#292929;border-radius:99px;overflow:hidden;margin:18px 0}
+.bar{height:100%;width:0;background:#fff}
+.next{font-size:20px;font-weight:650;margin-top:5px}
+.nexttime{font-size:27px;font-variant-numeric:tabular-nums;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:#151515;border:1px solid #292929;border-radius:14px;padding:13px}
+.stat b{display:block;font-size:21px;margin-top:4px;font-variant-numeric:tabular-nums}
+.buttons{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px;margin-top:14px}
+button{border:0;border-radius:14px;padding:16px 10px;background:#292929;color:#fff;font-size:16px;font-weight:700}
+button.main{background:#fff;color:#000}
+.audio{margin-top:12px;color:#aaa;font-size:12px;text-align:center;min-height:18px}
+.list{margin-top:14px}
+.row{display:grid;grid-template-columns:72px 1fr 72px;gap:8px;align-items:center;padding:11px 4px;border-bottom:1px solid #222;font-size:14px;cursor:pointer}
+.row.active{background:#202020;border-radius:10px;padding-left:10px}
+.time,.dur{color:#aaa;font-variant-numeric:tabular-nums}
+.dur{text-align:right}
+.small{color:#aaa;font-size:12px;margin-top:4px}
+@media(max-width:480px){
+.timer{font-size:54px}
+.current{font-size:25px}
+.row{grid-template-columns:64px 1fr 60px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>TIMEcode SHOW</h1>
+      <div class="badge">Sacrare • áudio por faixa • sincronizado pelo áudio</div>
+    </div>
+    <div id="count">1 / 18</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Momento atual</div>
+    <div class="current" id="current"></div>
+    <div class="type" id="type"></div>
+
+    <div class="timer" id="elapsed">00:00</div>
+    <div class="sub">decorrido • <span id="remainCurrent">00:00</span> restantes neste momento</div>
+
+    <div class="progress"><div class="bar" id="bar"></div></div>
+
+    <div class="label">Próximo</div>
+    <div class="next" id="next"></div>
+    <div class="nexttime">começa em <span id="toNext">00:00</span></div>
+
+    <div class="audio" id="audioStatus">Áudio pronto para iniciar</div>
+  </div>
+
+  <div class="grid">
+    <div class="stat">
+      <span class="label">Show decorrido</span>
+      <b id="showElapsed">00:00:00</b>
+    </div>
+    <div class="stat">
+      <span class="label">Show restante</span>
+      <b id="showRemain">01:00:07</b>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="prev()">↩ Voltar</button>
+    <button class="main" id="play" onclick="toggle()">▶ Iniciar</button>
+    <button onclick="next()">Próximo ⏭</button>
+  </div>
+
+  <div class="list" id="list"></div>
+  <audio id="audio" preload="metadata" playsinline></audio>
+</div>
+
+<script>
+/*
+  IMPORTANTE:
+  Os nomes abaixo são EXATAMENTE os nomes dos MP3 enviados.
+  Não renomeie os arquivos no GitHub.
+  O número na primeira coluna é a posição do show.
+*/
+
+const tracks = [
+  ["1 ABERTURA + 99 NÃO É 100", "1 ABERTURA + 99 NÃO É 100.mp3", 245],
+  ["2 RESTAURADOR", "2 RESTAURADOR.mp3", 265],
+  ["3 APRESENTAÇÃO", "3 APRESENTAÇÃO.mp3", 37],
+  ["4 MEDLEY ALEGRIA", "4 MEDLEY ALEGRIA.mp3", 320],
+  ["5 FALA DA BOTA", "5 FALA DA BOTA.mp3", 39],
+  ["6 CHEIA DE GRAÇA", "6 CHEIA DE GRAÇA.mp3", 309],
+  ["7 FALA REDES SOCIAIS", "7 FALA REDES SOCIAIS.mp3", 89],
+  ["8 INSPIRA", "8 INSPIRA.mp3", 213],
+  ["9 MINISTRAÇÃO CAROL", "9 MINISTRAÇÃO CAROL.mp3", 150],
+  ["10 LUGAR SEGURO", "10 LUGAR SEGURO.mp3", 284],
+  ["11 MINISTRAÇÃO DAMI", "11 MINISTRAÇÃO DAMI.mp3", 60],
+  ["12 JESUS ESTÁ AQUI + LÁZARO", "12 JESUS ESTÁ AQUI + LÁZARO.mp3", 372],
+  ["13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS", "13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS.mp3", 241],
+  ["14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO", "14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO.mp3", 188],
+  ["15 ALTERADO", "15 ALTERADO.mp3", 225],
+  ["16 MEDLEY TENDA", "16 MEDLEY TENDA.mp3", 263],
+  ["17 FALA FINAL REDES SOCIAIS", "17 FALA FINAL REDES SOCIAIS.mp3", 92],
+  ["18 EVANGELIZAR", "18 EVANGELIZAR.mp3", 215]
+];
+
+const audio = document.getElementById("audio");
+let index = 0;
+let running = false;
+let raf = null;
+
+const total = tracks.reduce((sum, t) => sum + t[2], 0);
+
+function fmt(sec, hours=false){
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if(hours || h) return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+
+function before(i){
+  return tracks.slice(0,i).reduce((sum,t) => sum + t[2], 0);
+}
+
+function loadTrack(i, autoplay=false){
+  index = Math.max(0, Math.min(tracks.length-1, i));
+  const file = tracks[index][1];
+
+  audio.src = "./" + encodeURIComponent(file);
+  audio.load();
+
+  document.getElementById("audioStatus").textContent = "Carregando: " + file;
+  render();
+
+  if(autoplay){
+    audio.addEventListener("canplay", function once(){
+      audio.removeEventListener("canplay", once);
+      audio.play().then(()=>{
+        running = true;
+        document.getElementById("audioStatus").textContent = "▶ Tocando";
+        loop();
+        render();
+      }).catch(()=>{
+        running = false;
+        document.getElementById("audioStatus").textContent = "Toque em Iniciar para reproduzir.";
+        render();
+      });
+    }, {once:true});
+  }
+}
+
+function currentTime(){
+  return Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+}
+
+function render(){
+  const t = tracks[index];
+  const duration = t[2];
+  const elapsed = Math.min(currentTime(), duration);
+  const remaining = Math.max(0, duration - elapsed);
+  const showElapsed = before(index) + elapsed;
+  const showRemaining = Math.max(0, total - showElapsed);
+
+  document.getElementById("current").textContent = t[0];
+  document.getElementById("type").textContent = "MP3 • " + fmt(duration);
+  document.getElementById("elapsed").textContent = fmt(elapsed);
+  document.getElementById("remainCurrent").textContent = fmt(remaining);
+  document.getElementById("bar").style.width = Math.min(100, elapsed / duration * 100) + "%";
+
+  document.getElementById("next").textContent =
+    tracks[index+1] ? tracks[index+1][0] : "FIM DO SHOW";
+
+  document.getElementById("toNext").textContent =
+    tracks[index+1] ? fmt(remaining) : "—";
+
+  document.getElementById("showElapsed").textContent = fmt(showElapsed, true);
+  document.getElementById("showRemain").textContent = fmt(showRemaining, true);
+  document.getElementById("count").textContent = (index+1) + " / " + tracks.length;
+  document.getElementById("play").textContent = running ? "⏸ Pausar" : "▶ Iniciar";
+
+  document.querySelectorAll(".row").forEach((row,i)=>{
+    row.classList.toggle("active", i === index);
+  });
+}
+
+function loop(){
+  if(!running) return;
+  render();
+  raf = requestAnimationFrame(loop);
+}
+
+function start(){
+  if(!audio.src) loadTrack(index, false);
+
+  audio.play().then(()=>{
+    running = true;
+    document.getElementById("audioStatus").textContent = "▶ Tocando";
+    loop();
+    render();
+  }).catch(()=>{
+    document.getElementById("audioStatus").textContent =
+      "Não foi possível tocar. Confira se o MP3 está na mesma pasta do index.html.";
+  });
+}
+
+function toggle(){
+  if(running){
+    audio.pause();
+    running = false;
+    cancelAnimationFrame(raf);
+    document.getElementById("audioStatus").textContent = "⏸ Pausado";
+    render();
+  }else{
+    start();
+  }
+}
+
+function next(){
+  if(index < tracks.length-1){
+    running = false;
+    audio.pause();
+    loadTrack(index+1, true);
+  }
+}
+
+function prev(){
+  if(currentTime() > 3){
+    audio.currentTime = 0;
+    render();
+    return;
+  }
+  if(index > 0){
+    running = false;
+    audio.pause();
+    loadTrack(index-1, false);
+  }
+}
+
+audio.addEventListener("ended", ()=>{
+  if(index < tracks.length-1){
+    loadTrack(index+1, true);
+  }else{
+    running = false;
+    document.getElementById("audioStatus").textContent = "Show finalizado";
+    render();
+  }
+});
+
+audio.addEventListener("timeupdate", ()=>{
+  if(running) render();
+});
+
+audio.addEventListener("error", ()=>{
+  document.getElementById("audioStatus").textContent =
+    "Não foi possível carregar este MP3. Confira se o nome no GitHub está exatamente igual.";
+});
+
+tracks.forEach((t,i)=>{
+  const row = document.createElement("div");
+  row.className = "row";
+  row.onclick = ()=>{
+    running = false;
+    audio.pause();
+    loadTrack(i, false);
+  };
+  row.innerHTML =
+    `<div class="time">${fmt(before(i),true)}</div>` +
+    `<div>${t[0]}<div class="small">MP3 • ${fmt(t[2])}</div></div>` +
+    `<div class="dur">${fmt(t[2])}</div>`;
+  document.getElementById("list").appendChild(row);
+});
+
+loadTrack(0, false);
+</script>
+</body>
+</html>
