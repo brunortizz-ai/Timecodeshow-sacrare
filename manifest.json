@@ -1,8 +1,0 @@
-{
-  "name": "TIMEcode SHOW — Sacrare",
-  "short_name": "TIMEcode SHOW",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#080808"
-}
