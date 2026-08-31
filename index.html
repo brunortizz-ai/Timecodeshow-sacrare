@@ -1,0 +1,82 @@
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TIMEcode SHOW — Sacrare</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 40px}h1{font-size:21px;margin:0}.top{display:flex;justify-content:space-between}
+.muted{color:#aaa;font-size:13px}.tabs,.buttons,.stats,.actions{display:grid;gap:10px;margin-top:12px}.tabs{grid-template-columns:1fr 1fr}.buttons{grid-template-columns:1fr 1.4fr 1fr}.stats{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr 1fr}
+button,input{border:1px solid #444;border-radius:14px;padding:13px;background:#191919;color:#fff;font-size:16px}button{font-weight:700}button.primary,.tab.active{background:#fff;color:#000}
+.tab{border:1px solid #333}.card,.panel,.stat,.row{background:#151515;border:1px solid #292929;border-radius:18px}.card,.panel,.stat{padding:18px;margin-top:12px}
+.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}.current{font-size:29px;font-weight:800;margin:7px 0}.timer{font-size:64px;font-weight:850;text-align:center;font-variant-numeric:tabular-nums;margin:22px 0 2px}
+.center{text-align:center}.progress{height:8px;background:#292929;border-radius:8px;overflow:hidden;margin:18px 0}.bar{height:100%;width:0;background:#fff}
+.next{font-size:23px;font-weight:750;margin-top:5px}.value{font-size:27px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:5px}
+.row{display:grid;grid-template-columns:70px 1fr 60px;gap:10px;align-items:center;padding:12px;margin-top:8px;cursor:pointer}.row.active{outline:2px solid #fff}
+.time,.dur{color:#aaa;font-variant-numeric:tabular-nums}.dur{text-align:right}.small{font-size:12px;color:#aaa;margin-top:3px}
+.editorRow{display:flex;gap:8px;align-items:center;border-bottom:1px solid #292929;padding:9px 0}.editorRow:last-child{border-bottom:0}.ename{flex:1;min-width:0}.ename div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.icon{padding:9px 11px;border-radius:10px}.hidden{display:none}.status{text-align:center;color:#aaa;min-height:20px;margin-top:10px}
+.notice{font-size:13px;color:#aaa;line-height:1.45}
+</style></head><body><div class="wrap">
+<div class="top"><h1>TIMEcode SHOW</h1><div id="count">1 / 18</div></div>
+<div class="muted" style="margin-top:4px">Sacrare • repertório editável • offline</div>
+<div class="tabs"><button class="tab active" id="tabShow">🎤 SHOW</button><button class="tab" id="tabEdit">⚙️ EDITAR REPERTÓRIO</button></div>
+
+<section id="show">
+<div class="card"><div class="label">Momento atual</div><div class="current" id="cur">—</div><div class="muted" id="dur">—</div>
+<div class="timer" id="elapsed">00:00</div><div class="center muted">decorrido • <span id="remain">00:00</span> restantes</div>
+<div class="progress"><div class="bar" id="bar"></div></div><div class="label">Próximo</div><div class="next" id="next">—</div>
+<div class="center" style="margin-top:7px">começa em <b id="toNext">—</b></div><div class="status" id="status">Selecione os MP3 na aba Editar Repertório.</div></div>
+<div class="stats"><div class="stat"><div class="label">Show decorrido</div><div class="value" id="showElapsed">00:00:00</div></div><div class="stat"><div class="label">Show restante</div><div class="value" id="showRemain">00:00:00</div></div></div>
+<div class="buttons"><button id="prev">↩️ Voltar</button><button class="primary" id="play">▶️ Iniciar</button><button id="nextBtn">Próximo ⏭️</button></div>
+<div id="list"></div></section>
+
+<section id="edit" class="hidden">
+<div class="panel"><b>Biblioteca de MP3</b><div class="notice" style="margin:6px 0 10px">Selecione os MP3. O sistema cria uma identificação interna para cada arquivo, então acentos e nomes diferentes não quebram a associação.</div>
+<input id="files" type="file" accept=".mp3,audio/mpeg" multiple><div class="notice" id="fileInfo" style="margin-top:8px">Nenhum arquivo selecionado.</div></div>
+<div class="panel"><b>Repertório deste show</b><div class="notice" style="margin:6px 0">↑ ↓ muda a ordem • 🗑️ remove • adicionar coloca uma música da biblioteca no final.</div>
+<div id="editor"></div><div class="actions"><button id="reset">Restaurar original</button><button class="primary" id="save">💾 Salvar</button></div></div>
+<div class="panel"><b>Adicionar ao show</b><select id="select" style="width:100%;padding:13px;background:#0d0d0d;color:#fff;border:1px solid #444;border-radius:14px;margin-top:10px"><option value="">Escolha um MP3...</option></select>
+<div class="actions"><button class="primary" id="add">➕ Adicionar</button><button id="backShow">🎤 Voltar</button></div></div>
+</section></div>
+<audio id="audio" preload="metadata" playsinline></audio>
+<script>
+const DEFAULT_TRACKS=[["1 ABERTURA + 99 NÃO É 100", "1 ABERTURA + 99 NÃO É 100.mp3", 245], ["2 RESTAURADOR", "2 RESTAURADOR.mp3", 265], ["3 APRESENTAÇÃO", "3 APRESENTAÇÃO.mp3", 37], ["4 MEDLEY ALEGRIA", "4 MEDLEY ALEGRIA.mp3", 320], ["5 FALA DA BOTA", "5 FALA DA BOTA.mp3", 39], ["6 CHEIA DE GRAÇA", "6 CHEIA DE GRAÇA.mp3", 309], ["7 FALA REDES SOCIAIS", "7 FALA REDES SOCIAIS.mp3", 89], ["8 INSPIRA", "8 INSPIRA.mp3", 213], ["9 MINISTRAÇÃO CAROL", "9 MINISTRAÇÃO CAROL.mp3", 150], ["10 LUGAR SEGURO", "10 LUGAR SEGURO.mp3", 284], ["11 MINISTRAÇÃO DAMI", "11 MINISTRAÇÃO DAMI.mp3", 60], ["12 JESUS ESTÁ AQUI + LÁZARO", "12 JESUS ESTÁ AQUI + LÁZARO.mp3", 372], ["13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS", "13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS.mp3", 241], ["14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO", "14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO.mp3", 188], ["15 ALTERADO", "15 ALTERADO.mp3", 225], ["16 MEDLEY TENDA", "16 MEDLEY TENDA.mp3", 263], ["17 FALA FINAL REDES SOCIAIS", "17 FALA FINAL REDES SOCIAIS.mp3", 92], ["18 EVANGELIZAR", "18 EVANGELIZAR.mp3", 215]];
+const audio=document.getElementById("audio");
+let tracks=loadSaved(), index=0, running=false, raf=0;
+const fileMap=new Map();
+
+function loadSaved(){try{const x=JSON.parse(localStorage.getItem("sacrare_playlist_v3"));if(Array.isArray(x)&&x.length)return x}catch(e){}return DEFAULT_TRACKS.map(t=>[...t])}
+function persist(){localStorage.setItem("sacrare_playlist_v3",JSON.stringify(tracks))}
+function norm(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\.mp3$/i,"").replace(/[^a-z0-9]+/g,"")}
+function findFile(name){if(fileMap.has(name))return fileMap.get(name);const n=norm(name);for(const [k,v] of fileMap)if(norm(k)===n)return v;return null}
+function fmt(x,h=false){x=Math.max(0,Math.floor(Number(x)||0));let H=Math.floor(x/3600),M=Math.floor(x%3600/60),S=x%60;return (h||H)?String(H).padStart(2,"0")+":"+String(M).padStart(2,"0")+":"+String(S).padStart(2,"0"):String(M).padStart(2,"0")+":"+String(S).padStart(2,"0")}
+function before(i){return tracks.slice(0,i).reduce((a,t)=>a+(Number(t[2])||0),0)}
+function total(){return tracks.reduce((a,t)=>a+(Number(t[2])||0),0)}
+function status(s){document.getElementById("status").textContent=s}
+function render(){if(!tracks.length)return;let t=tracks[index],d=Number(t[2])||0,e=Math.min(audio.currentTime||0,d),r=Math.max(0,d-e),se=before(index)+e;
+document.getElementById("cur").textContent=t[0];document.getElementById("dur").textContent="MP3 • "+fmt(d);document.getElementById("elapsed").textContent=fmt(e);document.getElementById("remain").textContent=fmt(r);document.getElementById("bar").style.width=(d?e/d*100:0)+"%";
+document.getElementById("next").textContent=tracks[index+1]?.[0]||"FIM DO SHOW";document.getElementById("toNext").textContent=tracks[index+1]?fmt(r):"—";document.getElementById("showElapsed").textContent=fmt(se,true);document.getElementById("showRemain").textContent=fmt(total()-se,true);document.getElementById("count").textContent=(index+1)+" / "+tracks.length;document.getElementById("play").textContent=running?"⏸️ Pausar":"▶️ Iniciar";
+document.querySelectorAll("#list .row").forEach((x,i)=>x.classList.toggle("active",i===index))}
+function loadTrack(i,auto=false){index=Math.max(0,Math.min(tracks.length-1,i));let name=tracks[index][1],url=findFile(name);audio.src=url||("./"+encodeURI(name));audio.load();status(url?"Áudio pronto: "+name:"MP3 não selecionado: "+name);render();if(auto)start()}
+function start(){audio.play().then(()=>{running=true;status("▶️ Tocando");loop();render()}).catch(()=>status("Toque em Iniciar novamente."))}
+function loop(){if(!running)return;render();raf=requestAnimationFrame(loop)}
+function toggle(){if(running){audio.pause();running=false;cancelAnimationFrame(raf);status("⏸️ Pausado");render()}else start()}
+function nextTrack(){if(index<tracks.length-1){running=false;audio.pause();loadTrack(index+1,true)}}
+function prevTrack(){if((audio.currentTime||0)>3){audio.currentTime=0;render();return}if(index>0){running=false;audio.pause();loadTrack(index-1)}}
+audio.addEventListener("ended",()=>{if(index<tracks.length-1)loadTrack(index+1,true);else{running=false;status("🎉 Show finalizado");render()}});
+audio.addEventListener("timeupdate",render);audio.addEventListener("error",()=>status("⚠️ MP3 não encontrado. Selecione os arquivos na aba Editar Repertório."));
+
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function renderList(){let el=document.getElementById("list");el.innerHTML="";tracks.forEach((t,i)=>{let r=document.createElement("div");r.className="row";r.onclick=()=>{running=false;audio.pause();loadTrack(i)};r.innerHTML='<div class="time">'+fmt(before(i),true)+'</div><div>'+esc(t[0])+'<div class="small">'+esc(t[1])+'</div></div><div class="dur">'+fmt(t[2])+'</div>';el.appendChild(r)});render()}
+function renderEditor(){let el=document.getElementById("editor");el.innerHTML="";tracks.forEach((t,i)=>{let r=document.createElement("div");r.className="editorRow";r.innerHTML='<b style="width:26px">'+(i+1)+'</b><div class="ename"><div>'+esc(t[0])+'</div><div class="small">'+esc(t[1])+' • '+fmt(t[2])+'</div></div>';let u=document.createElement("button");u.className="icon";u.textContent="↑";u.onclick=()=>move(i,-1);let d=document.createElement("button");d.className="icon";d.textContent="↓";d.onclick=()=>move(i,1);let q=document.createElement("button");q.className="icon";q.textContent="🗑️";q.onclick=()=>remove(i);r.append(u,d,q);el.appendChild(r)});updateSelect()}
+function move(i,d){let j=i+d;if(j<0||j>=tracks.length)return;[tracks[i],tracks[j]]=[tracks[j],tracks[i]];if(index===i)index=j;else if(index===j)index=i;persist();renderEditor();renderList()}
+function remove(i){if(tracks.length<=1)return;tracks.splice(i,1);if(index>=tracks.length)index=tracks.length-1;persist();loadTrack(index);renderEditor();renderList()}
+function updateSelect(){let s=document.getElementById("select");s.innerHTML='<option value="">Escolha um MP3...</option>';for(const [name] of fileMap){let o=document.createElement("option");o.value=name;o.textContent=name;s.appendChild(o)}}
+document.getElementById("files").onchange=e=>{fileMap.clear();for(const f of e.target.files)fileMap.set(f.name,URL.createObjectURL(f));document.getElementById("fileInfo").textContent=fileMap.size+" MP3 selecionados.";updateSelect();status("Biblioteca carregada.");loadTrack(index)};
+document.getElementById("add").onclick=()=>{let name=document.getElementById("select").value;if(!name)return;let u=findFile(name),a=new Audio(u);let title=name.replace(/\.mp3$/i,"");tracks.push([title,name,0]);let added=tracks.length-1;a.onloadedmetadata=()=>{tracks[added][2]=a.duration;persist();renderEditor();renderList()};persist();renderEditor();renderList()};
+document.getElementById("save").onclick=()=>{persist();status("💾 Repertório salvo neste aparelho.");renderList()};
+document.getElementById("reset").onclick=()=>{if(confirm("Restaurar a lista original?")){tracks=DEFAULT_TRACKS.map(t=>[...t]);index=0;persist();loadTrack(0);renderEditor();renderList()}};
+function showEdit(){document.getElementById("show").classList.add("hidden");document.getElementById("edit").classList.remove("hidden");document.getElementById("tabShow").classList.remove("active");document.getElementById("tabEdit").classList.add("active");renderEditor()}
+function showShow(){document.getElementById("edit").classList.add("hidden");document.getElementById("show").classList.remove("hidden");document.getElementById("tabEdit").classList.remove("active");document.getElementById("tabShow").classList.add("active");renderList()}
+document.getElementById("tabEdit").onclick=showEdit;document.getElementById("tabShow").onclick=showShow;document.getElementById("backShow").onclick=showShow;document.getElementById("play").onclick=toggle;document.getElementById("nextBtn").onclick=nextTrack;document.getElementById("prev").onclick=prevTrack;
+renderList();loadTrack(0);
+</script></body></html>
