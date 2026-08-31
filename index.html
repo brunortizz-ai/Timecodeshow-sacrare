@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>TIMEcode SHOW — Sacrare</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 40px}
+.top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:21px;margin:0}
+.badge{color:#aaa;font-size:13px}
+.card{background:#151515;border:1px solid #292929;border-radius:20px;padding:20px;margin-top:14px}
+.label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.08em}
+.current{font-size:30px;font-weight:800;margin:8px 0 4px}
+.type,.sub,.small{color:#aaa}
+.timer{font-variant-numeric:tabular-nums;font-size:68px;font-weight:850;text-align:center;margin:22px 0 2px}
+.sub{text-align:center;font-size:14px}
+.progress{height:9px;background:#292929;border-radius:9px;overflow:hidden;margin:20px 0}
+.bar{height:100%;width:0;background:#fff}
+.next{font-size:25px;font-weight:750;margin-top:7px}
+.nexttime{font-size:17px;text-align:center;margin-top:8px}
+.status{text-align:center;color:#aaa;margin-top:12px;min-height:22px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.stat{background:#151515;border:1px solid #292929;border-radius:18px;padding:18px}
+.value{font-size:29px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:6px}
+.buttons{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;margin-top:14px}
+button{border:0;border-radius:18px;padding:17px 10px;font-size:18px;font-weight:750;background:#292929;color:#fff}
+button.primary{background:#fff;color:#000}
+button:active{transform:scale(.98)}
+.row{display:grid;grid-template-columns:72px 1fr 58px;gap:10px;align-items:center;background:#151515;border:1px solid #292929;border-radius:16px;padding:13px;margin-top:8px}
+.row.active{outline:2px solid #fff}
+.time,.dur{font-variant-numeric:tabular-nums;color:#aaa}
+.dur{text-align:right}
+.editor{margin-top:18px}
+.editor h2{font-size:18px;margin:0 0 8px}
+.panel{background:#151515;border:1px solid #292929;border-radius:18px;padding:15px;margin-top:10px}
+.libraryRow,.playlistRow{display:flex;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid #292929}
+.libraryRow:last-child,.playlistRow:last-child{border-bottom:0}
+.libraryName,.playlistName{flex:1;min-width:0}
+.libraryName div,.playlistName div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini{font-size:12px;color:#aaa}
+.iconBtn{padding:9px 11px;border-radius:12px;font-size:16px}
+select,input{width:100%;background:#0d0d0d;color:#fff;border:1px solid #444;border-radius:12px;padding:12px;font-size:16px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.notice{font-size:13px;color:#aaa;line-height:1.45}
+.hidden{display:none}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.tab{padding:13px;background:#151515;border:1px solid #292929;border-radius:14px;text-align:center}
+.tab.active{background:#fff;color:#000}
+.danger{background:#3a2020}
+@media(max-width:500px){.timer{font-size:58px}.current{font-size:27px}.next{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1>TIMEcode SHOW</h1><div class="badge" id="count">1 / 18</div></div>
+  <div class="badge" style="margin-top:5px">Sacrare • repertório editável • offline</div>
+
+  <div class="tabs">
+    <button class="tab active" id="showTab">🎤 SHOW</button>
+    <button class="tab" id="editTab">⚙️ EDITAR REPERTÓRIO</button>
+  </div>
+
+  <section id="showView">
+    <div class="card">
+      <div class="label">Momento atual</div>
+      <div class="current" id="current">—</div>
+      <div class="type" id="type">MP3 • —</div>
+      <div class="timer" id="elapsed">00:00</div>
+      <div class="sub">decorrido • <span id="remainCurrent">00:00</span> restantes neste momento</div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="label">Próximo</div>
+      <div class="next" id="next">—</div>
+      <div class="nexttime">começa em <b id="toNext">—</b></div>
+      <div class="status" id="audioStatus">Selecione os MP3 abaixo ou use os arquivos publicados no GitHub.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="label">Show decorrido</div><div class="value" id="showElapsed">00:00:00</div></div>
+      <div class="stat"><div class="label">Show restante</div><div class="value" id="showRemain">00:00:00</div></div>
+    </div>
+
+    <div class="buttons">
+      <button id="back">↩️ Voltar</button>
+      <button class="primary" id="play">▶️ Iniciar</button>
+      <button id="nextBtn">Próximo ⏭️</button>
+    </div>
+
+    <div id="list" style="margin-top:14px"></div>
+  </section>
+
+  <section id="editView" class="hidden">
+    <div class="panel">
+      <h2>1. Biblioteca de MP3</h2>
+      <div class="notice">Selecione todos os MP3 que você usa nos shows. Depois, para trocar uma música, basta adicionar a nova ao repertório. Não precisa alterar código.</div>
+      <input id="files" type="file" accept=".mp3,audio/mpeg" multiple style="margin-top:10px">
+      <div class="notice" id="fileInfo" style="margin-top:8px">Nenhum MP3 selecionado nesta sessão.</div>
+    </div>
+
+    <div class="panel">
+      <h2>2. Repertório do show</h2>
+      <div class="notice">Use ↑ ↓ para mudar a ordem, ➕ para adicionar uma faixa e 🗑️ para retirar. A alteração fica salva neste aparelho.</div>
+      <div id="playlistEditor"></div>
+      <div class="actions">
+        <button id="reset">Restaurar repertório original</button>
+        <button class="primary" id="save">💾 Salvar repertório</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3. Adicionar uma música</h2>
+      <select id="librarySelect"><option value="">Selecione uma música da biblioteca...</option></select>
+      <div class="actions">
+        <button class="primary" id="addSelected">➕ Adicionar ao show</button>
+        <button id="showTab2">🎤 Voltar para o show</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<audio id="audio" preload="metadata" playsinline></audio>
+
+<script>
+const DEFAULT_TRACKS = [["1 ABERTURA + 99 NÃO É 100", "1 ABERTURA + 99 NÃO É 100.mp3", 245], ["2 RESTAURADOR", "2 RESTAURADOR.mp3", 265], ["3 APRESENTAÇÃO", "3 APRESENTAÇÃO.mp3", 37], ["4 MEDLEY ALEGRIA", "4 MEDLEY ALEGRIA.mp3", 320], ["5 FALA DA BOTA", "5 FALA DA BOTA.mp3", 39], ["6 CHEIA DE GRAÇA", "6 CHEIA DE GRAÇA.mp3", 309], ["7 FALA REDES SOCIAIS", "7 FALA REDES SOCIAIS.mp3", 89], ["8 INSPIRA", "8 INSPIRA.mp3", 213], ["9 MINISTRAÇÃO CAROL", "9 MINISTRAÇÃO CAROL.mp3", 150], ["10 LUGAR SEGURO", "10 LUGAR SEGURO.mp3", 284], ["11 MINISTRAÇÃO DAMI", "11 MINISTRAÇÃO DAMI.mp3", 60], ["12 JESUS ESTÁ AQUI + LÁZARO", "12 JESUS ESTÁ AQUI + LÁZARO.mp3", 372], ["13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS", "13 TEMPO LIVRE DE ORAÇÃO 4 MINUTOS.mp3", 241], ["14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO", "14 AGRADECIMENTO + APRESENTAÇÃO DA BANDA + ENSINAR ALTERADO.mp3", 188], ["15 ALTERADO", "15 ALTERADO.mp3", 225], ["16 MEDLEY TENDA", "16 MEDLEY TENDA.mp3", 263], ["17 FALA FINAL REDES SOCIAIS", "17 FALA FINAL REDES SOCIAIS.mp3", 92], ["18 EVANGELIZAR", "18 EVANGELIZAR.mp3", 215]];
+const audio = document.getElementById("audio");
+const filesInput = document.getElementById("files");
+const fileMap = new Map();
+let tracks = [];
+let index = 0, running = false, raf = null;
+
+function norm(s) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()
+    .replace(/\.mp3$/i,"").replace(/[^a-z0-9]+/g,"");
+}
+function fileURL(name) {
+  if(fileMap.has(name)) return fileMap.get(name);
+  const n=norm(name);
+  for(const [fn,url] of fileMap) if(norm(fn)===n) return url;
+  return null;
+}
+function fmt(sec,hours=false) {
+  sec=Math.max(0,Math.floor(sec||0));
+  const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+  if(hours||h) return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+function save() {
+  localStorage.setItem("sacrare_playlist",JSON.stringify(tracks));
+}
+function loadSaved() {
+  try {
+    const x=JSON.parse(localStorage.getItem("sacrare_playlist"));
+    if(Array.isArray(x)&&x.length) return x;
+  } catch(e) {}
+  return DEFAULT_TRACKS.map(t=>[...t]);
+}
+tracks=loadSaved();
+
+function totalDuration() { return tracks.reduce((a,t)=>a+(Number(t[2])||0),0); }
+function before(i) { return tracks.slice(0,i).reduce((a,t)=>a+(Number(t[2])||0),0); }
+function currentTime() { return Number.isFinite(audio.currentTime)?audio.currentTime:0; }
+
+function render() {
+  if(!tracks.length) return;
+  const t=tracks[index], dur=Number(t[2])||0, elapsed=Math.min(currentTime(),dur);
+  const rem=Math.max(0,dur-elapsed), showEl=before(index)+elapsed;
+  document.getElementById("current").textContent=t[0];
+  document.getElementById("type").textContent="MP3 • "+fmt(dur);
+  document.getElementById("elapsed").textContent=fmt(elapsed);
+  document.getElementById("remainCurrent").textContent=fmt(rem);
+  document.getElementById("bar").style.width=(dur?Math.min(100,elapsed/dur*100):0)+"%";
+  document.getElementById("next").textContent=tracks[index+1]?.[0]||"FIM DO SHOW";
+  document.getElementById("toNext").textContent=tracks[index+1]?fmt(rem):"—";
+  document.getElementById("showElapsed").textContent=fmt(showEl,true);
+  document.getElementById("showRemain").textContent=fmt(Math.max(0,totalDuration()-showEl),true);
+  document.getElementById("count").textContent=(index+1)+" / "+tracks.length;
+  document.getElementById("play").textContent=running?"⏸️ Pausar":"▶️ Iniciar";
+  document.querySelectorAll("#list .row").forEach((r,i)=>r.classList.toggle("active",i===index));
+}
+function setStatus(s) { document.getElementById("audioStatus").textContent=s; }
+
+function loadTrack(i,autoplay=false) {
+  if(!tracks.length) return;
+  index=Math.max(0,Math.min(tracks.length-1,i));
+  const file=tracks[index][1], url=fileURL(file);
+  if(url) {
+    audio.src=url;
+    setStatus("Áudio pronto: "+file);
+  } else {
+    audio.src="./"+encodeURI(file);
+    setStatus("Procurando: "+file);
+  }
+  audio.load(); render();
+  if(autoplay) start();
+}
+function start() {
+  audio.play().then(()=>{running=true;setStatus("▶️ Tocando");loop();render()})
+  .catch(()=>setStatus("Toque em Iniciar novamente para reproduzir."));
+}
+function toggle() {
+  if(running) {audio.pause();running=false;cancelAnimationFrame(raf);setStatus("⏸️ Pausado");render()}
+  else start();
+}
+function nextTrack() {
+  if(index<tracks.length-1) {running=false;audio.pause();loadTrack(index+1,true)}
+}
+function prevTrack() {
+  if(currentTime()>3) {audio.currentTime=0;render();return}
+  if(index>0) {running=false;audio.pause();loadTrack(index-1,false)}
+}
+function loop() { if(!running)return;render();raf=requestAnimationFrame(loop); }
+
+audio.addEventListener("ended",()=>{ if(index<tracks.length-1) loadTrack(index+1,true); else {running=false;setStatus("🎉 Show finalizado");render()} });
+audio.addEventListener("timeupdate",render);
+audio.addEventListener("error",()=>setStatus("⚠️ MP3 não encontrado. Selecione os arquivos na aba Editar Repertório."));
+
+function renderList() {
+  const el=document.getElementById("list"); el.innerHTML="";
+  tracks.forEach((t,i)=>{
+    const row=document.createElement("div");row.className="row";
+    row.onclick=()=>{running=false;audio.pause();loadTrack(i,false)};
+    row.innerHTML='<div class="time">'+fmt(before(i),true)+'</div><div>'+esc(t[0])+'<div class="small">MP3 • '+fmt(t[2])+'</div></div><div class="dur">'+fmt(t[2])+'</div>';
+    el.appendChild(row);
+  });
+  render();
+}
+function esc(s) { return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+function renderEditor() {
+  const el=document.getElementById("playlistEditor");el.innerHTML="";
+  tracks.forEach((t,i)=>{
+    const row=document.createElement("div");row.className="playlistRow";
+    row.innerHTML='<div style="width:28px">'+(i+1)+'</div><div class="playlistName"><div>'+esc(t[0])+'</div><div class="mini">'+esc(t[1])+' • '+fmt(t[2])+'</div></div>';
+    const up=document.createElement("button");up.className="iconBtn";up.textContent="↑";up.onclick=()=>move(i,-1);
+    const dn=document.createElement("button");dn.className="iconBtn";dn.textContent="↓";dn.onclick=()=>move(i,1);
+    const rm=document.createElement("button");rm.className="iconBtn danger";rm.textContent="🗑️";rm.onclick=()=>remove(i);
+    row.append(up,dn,rm);el.appendChild(row);
+  });
+  updateLibrary();
+}
+function move(i,d) {
+  const j=i+d;if(j<0||j>=tracks.length)return;
+  [tracks[i],tracks[j]]=[tracks[j],tracks[i]];
+  if(index===i)index=j; else if(index===j)index=i;
+  renderEditor();renderList();
+}
+function remove(i) {
+  if(tracks.length<=1)return;
+  tracks.splice(i,1);
+  if(index>=tracks.length)index=tracks.length-1;
+  if(index===i) loadTrack(index,false);
+  renderEditor();renderList();
+}
+function updateLibrary() {
+  const sel=document.getElementById("librarySelect");
+  sel.innerHTML='<option value="">Selecione uma música da biblioteca...</option>';
+  const names=[...fileMap.keys()].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  names.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o)});
+}
+filesInput.addEventListener("change",async e=>{
+  fileMap.clear();
+  for(const f of Array.from(e.target.files||[])) fileMap.set(f.name,URL.createObjectURL(f));
+  document.getElementById("fileInfo").textContent=fileMap.size+" MP3 selecionados. Agora você pode montar o repertório.";
+  updateLibrary();
+  // Match existing playlist files to selected files and obtain real durations where possible.
+  for(const t of tracks){
+    const url=fileURL(t[1]);
+    if(url){
+      const probe=new Audio();probe.src=url;
+      probe.addEventListener("loadedmetadata",()=>{ if(Number.isFinite(probe.duration)&&probe.duration>0){t[2]=probe.duration;save();renderEditor();renderList()} },{once:true});
+    }
+  }
+  loadTrack(index,false);
+});
+
+document.getElementById("addSelected").onclick=()=>{
+  const name=document.getElementById("librarySelect").value;if(!name)return;
+  if(tracks.some(t=>norm(t[1])===norm(name))){setStatus("Essa música já está no repertório.");return}
+  const display=name.replace(/\.mp3$/i,"");
+  tracks.push([display,name,0]);save();renderEditor();renderList();
+  // Read actual duration from the selected MP3.
+  const url=fileURL(name); if(url){
+    const a=new Audio();a.src=url;a.addEventListener("loadedmetadata",()=>{if(a.duration>0){tracks[tracks.length-1][2]=a.duration;save();renderEditor();renderList()}},{once:true});
+  }
+};
+document.getElementById("save").onclick=()=>{save();setStatus("💾 Repertório salvo neste aparelho.");renderList()};
+document.getElementById("reset").onclick=()=>{if(confirm("Restaurar a lista original?")){tracks=DEFAULT_TRACKS.map(t=>[...t]);index=0;save();loadTrack(0,false);renderEditor();renderList()}};
+
+function showEditor(){document.getElementById("showView").classList.add("hidden");document.getElementById("editView").classList.remove("hidden");document.getElementById("showTab").classList.remove("active");document.getElementById("editTab").classList.add("active");renderEditor()}
+function showShow(){document.getElementById("editView").classList.add("hidden");document.getElementById("showView").classList.remove("hidden");document.getElementById("editTab").classList.remove("active");document.getElementById("showTab").classList.add("active");renderList()}
+document.getElementById("showTab").onclick=showShow;
+document.getElementById("editTab").onclick=showEditor;
+document.getElementById("showTab2").onclick=showShow;
+document.getElementById("play").onclick=toggle;
+document.getElementById("nextBtn").onclick=nextTrack;
+document.getElementById("back").onclick=prevTrack;
+
+renderList();loadTrack(0,false);
+</script>
+</body></html>
